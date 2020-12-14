@@ -7,8 +7,8 @@ android {
         applicationId "com.armcomptech.akash.TicTacToe"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 4
-        versionName "2.2"
+        versionCode 5
+        versionName "2.2.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

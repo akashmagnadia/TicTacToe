@@ -1,4 +1,4 @@
-package com.armcomptech.akash.TicTacToe;
+package com.armcomptech.akash.tictactoe;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

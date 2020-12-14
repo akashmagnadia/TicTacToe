@@ -1,4 +1,4 @@
-package com.armcomptech.akash.TicTacToe;
+package com.armcomptech.akash.tictactoe;
 
 import android.os.Handler;
 import android.os.Bundle;

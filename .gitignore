@@ -9,3 +9,6 @@
 /build
 /captures
 .externalNativeBuild
+/TicTacToe.zip
+/app/release/app-release.aab
+/app/google-services.json
