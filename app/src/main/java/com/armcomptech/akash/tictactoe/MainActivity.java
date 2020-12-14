@@ -770,6 +770,29 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             Toast.makeText(getApplicationContext(),"Player Two Wins!",Toast.LENGTH_SHORT).show();
             incrementPlayerTwoScore();
         }
+
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                resetBoardNoAnimation();
+            }
+        };
+
+        //setEverything else to blank
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
+
+        //animate fade out
+        mButtonTopLeft.startAnimation(animFadeOut);
+        mButtonMidMid.startAnimation(animFadeOut);
+        mButtonBottomRight.startAnimation(animFadeOut);
+        Handler h = new Handler();
+        h.postDelayed(r, waitTime);
+
         return true;
     }
 

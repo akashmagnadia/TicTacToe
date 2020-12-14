@@ -4,11 +4,11 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "com.armcomptech.akash.TicTacToe"
+        applicationId "com.armcomptech.akash.tictactoe"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 5
-        versionName "2.2.1"
+        versionCode 6
+        versionName "2.2.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
