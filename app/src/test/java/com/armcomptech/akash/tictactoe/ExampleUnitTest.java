@@ -1,4 +1,4 @@
-package com.armcomptech.akash.tictactoe;
+package com.armcomptech.akash.TicTacToe;
 
 import org.junit.Test;
 

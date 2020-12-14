@@ -1,20 +1,23 @@
-package com.armcomptech.akash.tictactoe;
-
-//test successful
+package com.armcomptech.akash.TicTacToe;
 
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 public class MainActivity extends AppCompatActivity implements Animation.AnimationListener{
     Animation animFadeOut;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     private int turns = 0; //keeps track of how many valid turns are taken
     private int waitTime = 901;
@@ -24,27 +27,21 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
     //buttons
     private Button mButtonReset;
-    private Button mButtonTopLeft;
-    private Button mButtonTopMiddle;
-    private Button mButtonTopRight;
-    private Button mButtonMidLeft;
-    private Button mButtonMidMiddle;
-    private Button mButtonMidRight;
-    private Button mButtonLowLeft;
-    private Button mButtonLowMiddle;
-    private Button mButtonLowRight;
+    private Button mButtonStart;
 
     private ImageView mPlayerOneLogo;
     private ImageView mPlayerTwoLogo;
-    private ImageView mImageTopLeft;
-    private ImageView mImageTopMiddle;
-    private ImageView mImageTopRight;
-    private ImageView mImageMidLeft;
-    private ImageView mImageMidMiddle;
-    private ImageView mImageMidRight;
-    private ImageView mImageLowLeft;
-    private ImageView mImageLowMiddle;
-    private ImageView mImageLowRight;
+
+    private ImageButton mButtonTopLeft;
+    private ImageButton mButtonTopMid;
+    private ImageButton mButtonTopRight;
+    private ImageButton mButtonMidLeft;
+    private ImageButton mButtonMidMid;
+    private ImageButton mButtonMidRight;
+    private ImageButton mButtonBottomLeft;
+    private ImageButton mButtonBottomMid;
+    private ImageButton mButtonBottomRight;
+
 
     //keeps track of the score of both players
     private int playerOneScore;
@@ -62,10 +59,21 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     private char lowMiddle = ' ';
     private char lowRight = ' ';
 
+    //TODO: Change disableFirebaseLogging to false when releasing
+    public static Boolean disableFirebaseLogging = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Obtain the FirebaseAnalytics instance.
+        if (!disableFirebaseLogging) {
+            mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "App Opened");
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
+        }
 
         animFadeOut = AnimationUtils.loadAnimation(getBaseContext(),R.anim.fadeout);
         animFadeOut.setAnimationListener(this);
@@ -81,26 +89,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         mTextViewPlayerOneScore = findViewById(R.id.playerOneScore);
         mTextViewPlayerTwoScore = findViewById(R.id.playerTwoScore);
 
-        mButtonReset = findViewById(R.id.resetButton);
-        mButtonTopLeft = findViewById(R.id.topLeftButton);
-        mButtonTopMiddle = findViewById(R.id.topMiddleButton);
-        mButtonTopRight = findViewById(R.id.topRightButton);
-        mButtonMidLeft = findViewById(R.id.midLeftButton);
-        mButtonMidMiddle = findViewById(R.id.midMiddleButton);
-        mButtonMidRight = findViewById(R.id.midRightButton);
-        mButtonLowLeft = findViewById(R.id.lowLeftButton);
-        mButtonLowMiddle = findViewById(R.id.lowMiddleButton);
-        mButtonLowRight = findViewById(R.id.lowRightButton);
-
-        mImageTopLeft = findViewById(R.id.topLeftImage);
-        mImageTopMiddle = findViewById(R.id.topMiddleImage);
-        mImageTopRight = findViewById(R.id.topRightImage);
-        mImageMidLeft = findViewById(R.id.midLeftImage);
-        mImageMidMiddle = findViewById(R.id.midMiddleImage);
-        mImageMidRight = findViewById(R.id.midRightImage);
-        mImageLowLeft = findViewById(R.id.lowLeftImage);
-        mImageLowMiddle = findViewById(R.id.lowMiddleImage);
-        mImageLowRight = findViewById(R.id.lowRightImage);
+        mButtonReset = findViewById(R.id.reset_button);
+        mButtonStart = findViewById(R.id.start_button);
+        mButtonTopLeft = findViewById(R.id.topLeft);
+        mButtonTopMid = findViewById(R.id.topMid);
+        mButtonTopRight = findViewById(R.id.topRight);
+        mButtonMidLeft = findViewById(R.id.midLeft);
+        mButtonMidMid = findViewById(R.id.midMid);
+        mButtonMidRight = findViewById(R.id.midRight);
+        mButtonBottomLeft = findViewById(R.id.bottomLeft);
+        mButtonBottomMid = findViewById(R.id.bottomMid);
+        mButtonBottomRight = findViewById(R.id.bottomRight);
 
         mTextViewPlayerOneScore.setText("Player One: " + playerOneScore);
         mTextViewPlayerTwoScore.setText("Player Two: " + playerTwoScore);
@@ -125,12 +124,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageTopLeft.setImageResource(R.drawable.circle);
+                    mButtonTopLeft.setImageResource(R.drawable.circle);
                     topLeft = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageTopLeft.setImageResource(R.drawable.cross);
+                    mButtonTopLeft.setImageResource(R.drawable.cross);
                     topLeft = 'X';
                 }
 
@@ -138,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             }
         });
 
-        mButtonTopMiddle.setOnClickListener(new View.OnClickListener() {
+        mButtonTopMid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (topMiddle != ' ') {
@@ -147,12 +146,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageTopMiddle.setImageResource(R.drawable.circle);
+                    mButtonTopMid.setImageResource(R.drawable.circle);
                     topMiddle = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageTopMiddle.setImageResource(R.drawable.cross);
+                    mButtonTopMid.setImageResource(R.drawable.cross);
                     topMiddle = 'X';
                 }
 
@@ -169,12 +168,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageTopRight.setImageResource(R.drawable.circle);
+                    mButtonTopRight.setImageResource(R.drawable.circle);
                     topRight = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageTopRight.setImageResource(R.drawable.cross);
+                    mButtonTopRight.setImageResource(R.drawable.cross);
                     topRight = 'X';
                 }
 
@@ -191,12 +190,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageMidLeft.setImageResource(R.drawable.circle);
+                    mButtonMidLeft.setImageResource(R.drawable.circle);
                     midLeft = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageMidLeft.setImageResource(R.drawable.cross);
+                    mButtonMidLeft.setImageResource(R.drawable.cross);
                     midLeft = 'X';
                 }
 
@@ -204,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             }
         });
 
-        mButtonMidMiddle.setOnClickListener(new View.OnClickListener() {
+        mButtonMidMid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (midMiddle != ' ') {
@@ -213,12 +212,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageMidMiddle.setImageResource(R.drawable.circle);
+                    mButtonMidMid.setImageResource(R.drawable.circle);
                     midMiddle = 'O';
                 }
                 else{
                     playerTurn = 1; //alternate
-                    mImageMidMiddle.setImageResource(R.drawable.cross);
+                    mButtonMidMid.setImageResource(R.drawable.cross);
                     midMiddle = 'X';
                 }
 
@@ -235,12 +234,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageMidRight.setImageResource(R.drawable.circle);
+                    mButtonMidRight.setImageResource(R.drawable.circle);
                     midRight = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageMidRight.setImageResource(R.drawable.cross);
+                    mButtonMidRight.setImageResource(R.drawable.cross);
                     midRight = 'X';
                 }
 
@@ -248,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             }
         });
 
-        mButtonLowLeft.setOnClickListener(new View.OnClickListener() {
+        mButtonBottomLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (lowLeft != ' ') {
@@ -257,12 +256,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageLowLeft.setImageResource(R.drawable.circle);
+                    mButtonBottomLeft.setImageResource(R.drawable.circle);
                     lowLeft = 'O';
                 }
                 else{
                     playerTurn = 1; //alternate
-                    mImageLowLeft.setImageResource(R.drawable.cross);
+                    mButtonBottomLeft.setImageResource(R.drawable.cross);
                     lowLeft = 'X';
                 }
 
@@ -270,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             }
         });
 
-        mButtonLowMiddle.setOnClickListener(new View.OnClickListener() {
+        mButtonBottomMid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (lowMiddle != ' ') {
@@ -279,12 +278,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageLowMiddle.setImageResource(R.drawable.circle);
+                    mButtonBottomMid.setImageResource(R.drawable.circle);
                     lowMiddle = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageLowMiddle.setImageResource(R.drawable.cross);
+                    mButtonBottomMid.setImageResource(R.drawable.cross);
                     lowMiddle = 'X';
                 }
 
@@ -292,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             }
         });
 
-        mButtonLowRight.setOnClickListener(new View.OnClickListener() {
+        mButtonBottomRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (lowRight != ' ') {
@@ -301,12 +300,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
                 if (playerTurn == 1) {
                     playerTurn = 2; //alternate
-                    mImageLowRight.setImageResource(R.drawable.circle);
+                    mButtonBottomRight.setImageResource(R.drawable.circle);
                     lowRight = 'O';
                 }
                 else {
                     playerTurn = 1; //alternate
-                    mImageLowRight.setImageResource(R.drawable.cross);
+                    mButtonBottomRight.setImageResource(R.drawable.cross);
                     lowRight = 'X';
                 }
 
@@ -319,14 +318,12 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
     public void incrementPlayerOneScore() {
         playerOneScore++;
         mTextViewPlayerOneScore.setText("Player One: " + playerOneScore);
-        return;
     }
 
     //increase player two score by one
     public void incrementPlayerTwoScore() {
         playerTwoScore++;
         mTextViewPlayerTwoScore.setText("Player Two: " + playerTwoScore);
-        return;
     }
 
     public void updatePlayerLogoVisibility() {
@@ -358,15 +355,15 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
             }
         };
 
-        mImageTopLeft.startAnimation(animFadeOut);
-        mImageTopMiddle.startAnimation(animFadeOut);
-        mImageTopRight.startAnimation(animFadeOut);
-        mImageMidLeft.startAnimation(animFadeOut);
-        mImageMidMiddle.startAnimation(animFadeOut);
-        mImageMidRight.startAnimation(animFadeOut);
-        mImageLowLeft.startAnimation(animFadeOut);
-        mImageLowMiddle.startAnimation(animFadeOut);
-        mImageLowRight.startAnimation(animFadeOut);
+        mButtonTopLeft.startAnimation(animFadeOut);
+        mButtonTopMid.startAnimation(animFadeOut);
+        mButtonTopRight.startAnimation(animFadeOut);
+        mButtonMidLeft.startAnimation(animFadeOut);
+        mButtonMidMid.startAnimation(animFadeOut);
+        mButtonMidRight.startAnimation(animFadeOut);
+        mButtonBottomLeft.startAnimation(animFadeOut);
+        mButtonBottomMid.startAnimation(animFadeOut);
+        mButtonBottomRight.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
     }
@@ -388,15 +385,15 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         lowMiddle = ' ';
         lowRight = ' ';
 
-        mImageTopLeft.setImageResource(R.drawable.white);
-        mImageTopMiddle.setImageResource(R.drawable.white);
-        mImageTopRight.setImageResource(R.drawable.white);
-        mImageMidLeft.setImageResource(R.drawable.white);
-        mImageMidMiddle.setImageResource(R.drawable.white);
-        mImageMidRight.setImageResource(R.drawable.white);
-        mImageLowLeft.setImageResource(R.drawable.white);
-        mImageLowMiddle.setImageResource(R.drawable.white);
-        mImageLowRight.setImageResource(R.drawable.white);
+        mButtonTopLeft.setImageResource(R.mipmap.white);
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidMid.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
+        mButtonBottomRight.setImageResource(R.mipmap.white);
     }
 
     //make scribble sound when updating the score
@@ -406,14 +403,16 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
 
         updatePlayerLogoVisibility(); //update to show whos turn it is
 
-        checkLeftVert();
-        checkMiddleVert();
-        checkRightVert();
-        checkTopHorz();
-        checkMiddleHorz();
-        checkLowHorz();
-        checkTopLeftDiag();
-        checkTopRightDiag();
+        if ( checkLeftVert() ||
+                checkMiddleVert() ||
+                checkRightVert() ||
+                checkTopHorz() ||
+                checkMiddleHorz() ||
+                checkLowHorz() ||
+                checkTopLeftDiag() ||
+                checkTopRightDiag()) {
+            return;
+        }
 
         if (turns == 9) {
             Toast.makeText(getApplicationContext(),"It's a Draw!",Toast.LENGTH_SHORT).show();
@@ -451,17 +450,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageTopMiddle.setImageResource(R.drawable.white);
-        mImageTopRight.setImageResource(R.drawable.white);
-        mImageMidMiddle.setImageResource(R.drawable.white);
-        mImageMidRight.setImageResource(R.drawable.white);
-        mImageLowMiddle.setImageResource(R.drawable.white);
-        mImageLowRight.setImageResource(R.drawable.white);
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonMidMid.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
+        mButtonBottomRight.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageTopLeft.startAnimation(animFadeOut);
-        mImageMidLeft.startAnimation(animFadeOut);
-        mImageLowLeft.startAnimation(animFadeOut);
+        mButtonTopLeft.startAnimation(animFadeOut);
+        mButtonMidLeft.startAnimation(animFadeOut);
+        mButtonBottomLeft.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 
@@ -498,17 +497,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageTopLeft.setImageResource(R.drawable.white);
-        mImageTopRight.setImageResource(R.drawable.white);
-        mImageMidLeft.setImageResource(R.drawable.white);
-        mImageMidRight.setImageResource(R.drawable.white);
-        mImageLowLeft.setImageResource(R.drawable.white);
-        mImageLowRight.setImageResource(R.drawable.white);
+        mButtonTopLeft.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomRight.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageTopMiddle.startAnimation(animFadeOut);
-        mImageMidMiddle.startAnimation(animFadeOut);
-        mImageLowMiddle.startAnimation(animFadeOut);
+        mButtonTopMid.startAnimation(animFadeOut);
+        mButtonMidMid.startAnimation(animFadeOut);
+        mButtonBottomMid.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 
@@ -545,17 +544,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageTopLeft.setImageResource(R.drawable.white);
-        mImageTopMiddle.setImageResource(R.drawable.white);
-        mImageMidLeft.setImageResource(R.drawable.white);
-        mImageMidMiddle.setImageResource(R.drawable.white);
-        mImageLowLeft.setImageResource(R.drawable.white);
-        mImageLowMiddle.setImageResource(R.drawable.white);
+        mButtonTopLeft.setImageResource(R.mipmap.white);
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidMid.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageTopRight.startAnimation(animFadeOut);
-        mImageMidRight.startAnimation(animFadeOut);
-        mImageLowRight.startAnimation(animFadeOut);
+        mButtonTopRight.startAnimation(animFadeOut);
+        mButtonMidRight.startAnimation(animFadeOut);
+        mButtonBottomRight.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 
@@ -592,17 +591,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageMidLeft.setImageResource(R.drawable.white);
-        mImageMidMiddle.setImageResource(R.drawable.white);
-        mImageMidRight.setImageResource(R.drawable.white);
-        mImageLowLeft.setImageResource(R.drawable.white);
-        mImageLowMiddle.setImageResource(R.drawable.white);
-        mImageLowRight.setImageResource(R.drawable.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidMid.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
+        mButtonBottomRight.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageTopLeft.startAnimation(animFadeOut);
-        mImageTopMiddle.startAnimation(animFadeOut);
-        mImageTopRight.startAnimation(animFadeOut);
+        mButtonTopLeft.startAnimation(animFadeOut);
+        mButtonTopMid.startAnimation(animFadeOut);
+        mButtonTopRight.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 
@@ -639,17 +638,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageTopLeft.setImageResource(R.drawable.white);
-        mImageTopMiddle.setImageResource(R.drawable.white);
-        mImageTopRight.setImageResource(R.drawable.white);
-        mImageLowLeft.setImageResource(R.drawable.white);
-        mImageLowMiddle.setImageResource(R.drawable.white);
-        mImageLowRight.setImageResource(R.drawable.white);
+        mButtonTopLeft.setImageResource(R.mipmap.white);
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
+        mButtonBottomRight.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageMidLeft.startAnimation(animFadeOut);
-        mImageMidMiddle.startAnimation(animFadeOut);
-        mImageMidRight.startAnimation(animFadeOut);
+        mButtonMidLeft.startAnimation(animFadeOut);
+        mButtonMidMid.startAnimation(animFadeOut);
+        mButtonMidRight.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 
@@ -686,17 +685,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageTopLeft.setImageResource(R.drawable.white);
-        mImageTopMiddle.setImageResource(R.drawable.white);
-        mImageTopRight.setImageResource(R.drawable.white);
-        mImageMidLeft.setImageResource(R.drawable.white);
-        mImageMidMiddle.setImageResource(R.drawable.white);
-        mImageMidRight.setImageResource(R.drawable.white);
+        mButtonTopLeft.setImageResource(R.mipmap.white);
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidMid.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageLowLeft.startAnimation(animFadeOut);
-        mImageLowMiddle.startAnimation(animFadeOut);
-        mImageLowRight.startAnimation(animFadeOut);
+        mButtonBottomLeft.startAnimation(animFadeOut);
+        mButtonBottomMid.startAnimation(animFadeOut);
+        mButtonBottomRight.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 
@@ -733,17 +732,17 @@ public class MainActivity extends AppCompatActivity implements Animation.Animati
         };
 
         //setEverything else to blank
-        mImageTopMiddle.setImageResource(R.drawable.white);
-        mImageTopRight.setImageResource(R.drawable.white);
-        mImageMidLeft.setImageResource(R.drawable.white);
-        mImageMidRight.setImageResource(R.drawable.white);
-        mImageLowLeft.setImageResource(R.drawable.white);
-        mImageLowMiddle.setImageResource(R.drawable.white);
+        mButtonTopMid.setImageResource(R.mipmap.white);
+        mButtonTopRight.setImageResource(R.mipmap.white);
+        mButtonMidLeft.setImageResource(R.mipmap.white);
+        mButtonMidRight.setImageResource(R.mipmap.white);
+        mButtonBottomLeft.setImageResource(R.mipmap.white);
+        mButtonBottomMid.setImageResource(R.mipmap.white);
 
         //animate fade out
-        mImageTopLeft.startAnimation(animFadeOut);
-        mImageMidMiddle.startAnimation(animFadeOut);
-        mImageLowRight.startAnimation(animFadeOut);
+        mButtonTopLeft.startAnimation(animFadeOut);
+        mButtonMidMid.startAnimation(animFadeOut);
+        mButtonBottomRight.startAnimation(animFadeOut);
         Handler h = new Handler();
         h.postDelayed(r, waitTime);
 

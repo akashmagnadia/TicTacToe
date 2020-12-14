@@ -1,4 +1,4 @@
-package com.armcomptech.akash.tictactoe;
+package com.armcomptech.akash.TicTacToe;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.armcomptech.akash.tictactoe", appContext.getPackageName());
+        assertEquals("com.armcomptech.akash.TicTacToe", appContext.getPackageName());
     }
 }
